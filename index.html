@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MeloGOGO | Archivo Audiovisual</title>
+  <meta property="og:type" content="video.other">
+  <meta property="og:site_name" content="MeloGOGO">
+  <meta id="og-title" property="og:title" content="MeloGOGO | Archivo Audiovisual">
+  <meta id="og-description" property="og:description" content="melo GOGO solo adultos y lo mas visto en redes">
+  <meta id="og-image" property="og:image" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta id="tw-title" name="twitter:title" content="MeloGOGO | Archivo Audiovisual">
+  <meta id="tw-image" name="twitter:image" content="">
+  <link rel="stylesheet" href="cs.css">
+</head>
+<body>
+
+  <!-- Pantalla 100% x 100% FIXED -->
+  <div id="splash-ultimo-video" class="splash-full" style="display: none;">
+    <div class="splash-box">
+      <div class="splash-top">
+        <span id="splash-id">SEÑAL #01</span>
+        <span id="splash-vistas">403 VISTAS</span>
+        <span id="splash-timer">REDIRIGIENDO EN 3s</span>
+      </div>
+
+      <div class="splash-media">
+        <img id="splash-img" src="" alt="">
+      </div>
+
+      <div class="splash-footer">
+        <h2 id="splash-titulo"></h2>
+        <div class="splash-actions">
+          <button type="button" id="splash-compartir" class="btn-90s">COMPARTIR</button>
+          <button type="button" id="splash-copiar" class="btn-90s">COPIAR LINK</button>
+          <button type="button" id="splash-cancelar" class="btn-90s">Explora mas</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Espaciado flotante para compartir video en redes -->
+  <div id="modal-compartir-flotante" class="share-floating-backdrop" style="display: none;">
+    <div class="share-floating-box" role="dialog" aria-modal="true" aria-labelledby="share-modal-titulo">
+      <div class="share-floating-top">
+        <span>COMPARTIR EN REDES</span>
+        <button type="button" id="cerrar-compartir-flotante" class="btn-90s share-close-btn" aria-label="Cerrar">X</button>
+      </div>
+      <div class="share-floating-body">
+        <div class="share-preview-card">
+          <img id="share-preview-img" src="" alt="" class="share-preview-thumb">
+          <div class="share-preview-meta">
+            <p id="share-modal-titulo" class="share-video-name"></p>
+            <span id="share-modal-vistas" class="share-video-views">0 VISTAS</span>
+          </div>
+        </div>
+
+        <div class="share-link-row">
+          <input type="text" id="share-link-input" readonly>
+          <button type="button" id="share-copiar-input" class="btn-90s">COPIAR</button>
+        </div>
+
+        <div class="share-social-grid">
+          <a id="share-whatsapp" href="#" target="_blank" rel="noopener noreferrer" class="btn-90s share-social-btn">WHATSAPP</a>
+          <a id="share-telegram" href="#" target="_blank" rel="noopener noreferrer" class="btn-90s share-social-btn">TELEGRAM</a>
+          <a id="share-facebook" href="#" target="_blank" rel="noopener noreferrer" class="btn-90s share-social-btn">FACEBOOK</a>
+          <a id="share-x" href="#" target="_blank" rel="noopener noreferrer" class="btn-90s share-social-btn">X / TWITTER</a>
+        </div>
+
+        <div class="share-floating-actions">
+          <button type="button" id="share-nativo-btn" class="btn-90s">MÁS REDES / SISTEMA</button>
+          <button type="button" id="share-continuar-btn" class="btn-90s">LISTO</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header class="header">
+    <!-- Carrusel de texto superior -->
+    <div class="ticker-carousel" aria-label="Aviso de programación">
+      <div class="ticker-track">
+        <span>melo GOGO solo adultos y lo mas visto en redes facebook, twiter, instagram, telegram, discos etc...</span>
+        <span>melo GOGO solo adultos y lo mas visto en redes facebook, twiter, instagram, telegram, discos etc...</span>
+      </div>
+    </div>
+
+    <div class="container header-inner">
+      <div class="brand">
+        <img id="favicon" class="brand-logo-img" src="favicon.png" alt="Favicon">
+        <h1>Melo<span>GOGO</span></h1>
+      </div>
+      <div class="search-box">
+        <input type="text" id="buscador" placeholder="Buscar código o video...">
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ÚNICO ESPACIO DE ANUNCIO (Responsive Móvil y Desktop) -->
+    <aside class="ad-slot" aria-label="Espacio de anuncio">
+      <div class="ad-header">
+        <span>PUBLICIDAD</span>
+        <span>AD-SPACE</span>
+      </div>
+      <div id="espacio-anuncio" class="ad-content">
+        <!-- Pega aquí tu código/script/banner de anuncio -->
+        <div class="ad-placeholder">ESPACIO DE ANUNCIO (MÓVIL Y DESKTOP)</div>
+      </div>
+    </aside>
+
+    <div class="section-bar">
+      <h2>PROGRAMACIÓN DESTACADA</h2>
+      <span id="contador">0 VIDEOS</span>
+    </div>
+
+    <section id="grid-videos" class="video-grid">
+      <!-- Las tarjetas se renderizan desde vid.json -->
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>MeloGOGO BROADCAST SYSTEM © 1992 - TODOS LOS DERECHOS RESERVADOS</p>
+  </footer>
+
+  <script>
+    const NOMBRE_PARAMETRO = "melo";
+    const MIN_VISTAS = 120;
+    const MAX_VISTAS = 999;
+    const LARGO_TITULO_HEX = 32;
+    const CAMBIAR_AL_SUBIR_VIDEO = true;
+
+    const STORAGE_KEY_VISTAS = "melogogo_vistas_random_under1k_v1";
+    const STORAGE_KEY_TITULOS = "melogogo_titulos_hex_v1";
+    const STORAGE_KEY_CANTIDAD = "melogogo_cantidad_videos_v1";
+
+    const grid = document.getElementById('grid-videos');
+    const buscador = document.getElementById('buscador');
+    const contador = document.getElementById('contador');
+
+    // Elementos de la pantalla 100% x 100% fixed
+    const splash = document.getElementById('splash-ultimo-video');
+    const splashId = document.getElementById('splash-id');
+    const splashVistas = document.getElementById('splash-vistas');
+    const splashImg = document.getElementById('splash-img');
+    const splashTitulo = document.getElementById('splash-titulo');
+    const splashTimer = document.getElementById('splash-timer');
+    const splashCompartir = document.getElementById('splash-compartir');
+    const splashCopiar = document.getElementById('splash-copiar');
+    const splashCancelar = document.getElementById('splash-cancelar');
+
+    // Elementos del espaciado flotante para compartir en redes
+    const modalCompartir = document.getElementById('modal-compartir-flotante');
+    const cerrarCompartir = document.getElementById('cerrar-compartir-flotante');
+    const sharePreviewImg = document.getElementById('share-preview-img');
+    const shareModalTitulo = document.getElementById('share-modal-titulo');
+    const shareModalVistas = document.getElementById('share-modal-vistas');
+    const shareLinkInput = document.getElementById('share-link-input');
+    const shareCopiarInput = document.getElementById('share-copiar-input');
+    const shareWhatsapp = document.getElementById('share-whatsapp');
+    const shareTelegram = document.getElementById('share-telegram');
+    const shareFacebook = document.getElementById('share-facebook');
+    const shareX = document.getElementById('share-x');
+    const shareNativoBtn = document.getElementById('share-nativo-btn');
+    const shareContinuarBtn = document.getElementById('share-continuar-btn');
+
+    let listaVideos = [];
+    let vistasPorVideo = {};
+    let titulosAleatoriosPorVideo = {};
+    let intervaloRedireccion = null;
+    let segundosRestantesActual = 0;
+    let destinoActual = '#';
+    let linkCompartibleActual = '';
+    let tituloCompartibleActual = '';
+    let imgCompartibleActual = '';
+    let vistasCompartibleActual = 0;
+    let reanudarSplashAlCerrar = false;
+
+    function obtenerDestinoVideo(video) {
+      return video.url || video.link || '#';
+    }
+
+    function obtenerNombreEnJson(video, indiceReal) {
+      const nombreBruto = video.link_name || video.nombre || video.slug;
+      if (nombreBruto && String(nombreBruto).trim() !== '') {
+        return String(nombreBruto).trim();
+      }
+      return `video_${indiceReal + 1}`;
+    }
+
+    function obtenerClaveVideo(video, indiceReal) {
+      return `${indiceReal + 1}_${obtenerNombreEnJson(video, indiceReal).replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+    }
+
+    function generarNumeroAleatorioVistas() {
+      return Math.floor(Math.random() * (MAX_VISTAS - MIN_VISTAS + 1)) + MIN_VISTAS;
+    }
+
+    function generarCodigoHexAleatorio(longitud = LARGO_TITULO_HEX) {
+      const chars = "0123456789abcdef";
+      let codigo = "";
+      for (let i = 0; i < longitud; i++) {
+        codigo += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return codigo;
+    }
+
+    function detectarCambioCantidadVideos(totalActual) {
+      let cantidadAnterior = null;
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_CANTIDAD);
+        if (raw !== null) {
+          cantidadAnterior = parseInt(raw, 10);
+        }
+        localStorage.setItem(STORAGE_KEY_CANTIDAD, String(totalActual));
+      } catch (e) {
+        return false;
+      }
+
+      if (!CAMBIAR_AL_SUBIR_VIDEO) return false;
+      return cantidadAnterior !== null && !Number.isNaN(cantidadAnterior) && cantidadAnterior !== totalActual;
+    }
+
+    function prepararVistasYTitulosAleatorios(videos) {
+      const huboCambioCantidad = detectarCambioCantidadVideos(videos.length);
+
+      let vistasGuardadas = {};
+      let titulosGuardados = {};
+
+      if (!huboCambioCantidad) {
+        try {
+          vistasGuardadas = JSON.parse(localStorage.getItem(STORAGE_KEY_VISTAS) || '{}');
+          titulosGuardados = JSON.parse(localStorage.getItem(STORAGE_KEY_TITULOS) || '{}');
+        } catch (e) {
+          vistasGuardadas = {};
+          titulosGuardados = {};
+        }
+      }
+
+      const nuevasVistas = {};
+      const nuevosTitulos = {};
+
+      videos.forEach((video, idx) => {
+        const clave = obtenerClaveVideo(video, idx);
+
+        const vistaPrevia = typeof vistasGuardadas[clave] === 'number'
+          ? Math.min(vistasGuardadas[clave], MAX_VISTAS)
+          : generarNumeroAleatorioVistas();
+        nuevasVistas[clave] = vistaPrevia;
+
+        nuevosTitulos[clave] = (typeof titulosGuardados[clave] === 'string' && titulosGuardados[clave].trim() !== '')
+          ? titulosGuardados[clave]
+          : generarCodigoHexAleatorio(LARGO_TITULO_HEX);
+      });
+
+      try {
+        localStorage.setItem(STORAGE_KEY_VISTAS, JSON.stringify(nuevasVistas));
+        localStorage.setItem(STORAGE_KEY_TITULOS, JSON.stringify(nuevosTitulos));
+      } catch (e) {
+        // Ignorar si localStorage no está disponible
+      }
+
+      vistasPorVideo = nuevasVistas;
+      titulosAleatoriosPorVideo = nuevosTitulos;
+    }
+
+    function obtenerTituloMostrado(video, indiceReal) {
+      const clave = obtenerClaveVideo(video, indiceReal);
+      return titulosAleatoriosPorVideo[clave] || generarCodigoHexAleatorio(LARGO_TITULO_HEX);
+    }
+
+    function obtenerLinkCompartible(video, indiceReal) {
+      const baseUrl = `${window.location.origin}${window.location.pathname}`;
+      const nombreLink = obtenerNombreEnJson(video, indiceReal);
+      return `${baseUrl}?${NOMBRE_PARAMETRO}=${encodeURIComponent(nombreLink)}`;
+    }
+
+    function resolverUrlImagenAbsoluta(imgRuta) {
+      if (!imgRuta) return '';
+      try {
+        return new URL(imgRuta, window.location.href).href;
+      } catch (e) {
+        return imgRuta;
+      }
+    }
+
+    function sincronizarMetaDatosVideo(titulo, imgUrl, vistas, link) {
+      const imgAbsoluta = resolverUrlImagenAbsoluta(imgUrl);
+      document.title = `${titulo} | MeloGOGO`;
+
+      const ogTitle = document.getElementById('og-title');
+      const ogDesc = document.getElementById('og-description');
+      const ogImage = document.getElementById('og-image');
+      const twTitle = document.getElementById('tw-title');
+      const twImage = document.getElementById('tw-image');
+
+      if (ogTitle) ogTitle.setAttribute('content', `${titulo} - MeloGOGO`);
+      if (ogDesc) ogDesc.setAttribute('content', `${vistas} VISTAS | ${link}`);
+      if (ogImage) ogImage.setAttribute('content', imgAbsoluta);
+      if (twTitle) twTitle.setAttribute('content', `${titulo} - MeloGOGO`);
+      if (twImage) twImage.setAttribute('content', imgAbsoluta);
+    }
+
+    function buscarIndicePorParametro(valorParam, videos) {
+      if (!valorParam) return null;
+
+      const indicePorNombre = videos.findIndex((video, idx) => {
+        const nombreVideo = obtenerNombreEnJson(video, idx).toLowerCase();
+        return nombreVideo === valorParam.toLowerCase();
+      });
+      if (indicePorNombre !== -1) return indicePorNombre;
+
+      const numero = parseInt(valorParam, 10);
+      if (!Number.isNaN(numero) && numero >= 1 && numero <= videos.length) {
+        return numero - 1;
+      }
+
+      return null;
+    }
+
+    async function copiarAlPortapapeles(texto, boton) {
+      const textoOriginal = boton.textContent;
+      try {
+        await navigator.clipboard.writeText(texto);
+      } catch (e) {
+        const aux = document.createElement('textarea');
+        aux.value = texto;
+        document.body.appendChild(aux);
+        aux.select();
+        document.execCommand('copy');
+        document.body.removeChild(aux);
+      }
+      boton.textContent = '¡COPIADO!';
+      setTimeout(() => {
+        boton.textContent = textoOriginal;
+      }, 1500);
+    }
+
+    function tiempoSegundosReducido() {
+      const base = Math.floor(Math.random() * (60 - 3 + 1)) + 3;
+      return Math.max(1, Math.round(base * 0.3));
+    }
+
+    function iniciarContadorSplash() {
+      clearInterval(intervaloRedireccion);
+      if (segundosRestantesActual > 0) {
+        splashTimer.textContent = `REDIRIGIENDO EN ${segundosRestantesActual}s`;
+      }
+      intervaloRedireccion = setInterval(() => {
+        segundosRestantesActual -= 1;
+        if (segundosRestantesActual > 0) {
+          splashTimer.textContent = `REDIRIGIENDO EN ${segundosRestantesActual}s`;
+        } else {
+          clearInterval(intervaloRedireccion);
+          if (destinoActual && destinoActual !== '#') {
+            window.location.href = destinoActual;
+          }
+        }
+      }, 1000);
+    }
+
+    function configurarEnlacesRedes(titulo, imgUrl, vistas, link) {
+      const imgAbsoluta = resolverUrlImagenAbsoluta(imgUrl);
+      const mensaje = `${titulo} (${vistas} VISTAS)\n${imgAbsoluta ? `IMG: ${imgAbsoluta}\n` : ''}${link}`;
+      const textoEncoded = encodeURIComponent(`${titulo} (${vistas} VISTAS) - MeloGOGO`);
+      const linkEncoded = encodeURIComponent(link);
+
+      shareWhatsapp.href = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+      shareTelegram.href = `https://t.me/share/url?url=${linkEncoded}&text=${encodeURIComponent(`${titulo} (${vistas} VISTAS)`)}`;
+      shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${linkEncoded}`;
+      shareX.href = `https://twitter.com/intent/tweet?text=${textoEncoded}&url=${linkEncoded}`;
+    }
+
+    async function abrirEspaciadoCompartir(datos, desdeSplash = false) {
+      tituloCompartibleActual = datos.titulo;
+      imgCompartibleActual = datos.img;
+      vistasCompartibleActual = datos.vistas;
+      linkCompartibleActual = datos.link;
+
+      sharePreviewImg.src = datos.img || '';
+      sharePreviewImg.alt = datos.titulo;
+      shareModalTitulo.textContent = datos.titulo;
+      shareModalVistas.textContent = `${datos.vistas} VISTAS`;
+      shareLinkInput.value = datos.link;
+
+      sincronizarMetaDatosVideo(datos.titulo, datos.img, datos.vistas, datos.link);
+      configurarEnlacesRedes(datos.titulo, datos.img, datos.vistas, datos.link);
+
+      if (desdeSplash && splash.style.display !== 'none') {
+        clearInterval(intervaloRedireccion);
+        reanudarSplashAlCerrar = true;
+        splashTimer.textContent = `PAUSADO (${segundosRestantesActual}s)`;
+      } else {
+        reanudarSplashAlCerrar = false;
+      }
+
+      modalCompartir.style.display = 'flex';
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: tituloCompartibleActual || 'MeloGOGO',
+            text: `${tituloCompartibleActual} (${vistasCompartibleActual} VISTAS) - MeloGOGO`,
+            url: linkCompartibleActual
+          });
+        } catch (err) {
+          // Si el usuario cierra el menú nativo, queda abierto el flotante con los botones de redes
+        }
+      }
+    }
+
+    function cerrarEspaciadoCompartir() {
+      modalCompartir.style.display = 'none';
+      if (reanudarSplashAlCerrar && splash.style.display !== 'none') {
+        reanudarSplashAlCerrar = false;
+        iniciarContadorSplash();
+      }
+    }
+
+    function iniciarPantallaVideo(videos, indiceForzado = null) {
+      if (!videos || videos.length === 0) return;
+
+      let indiceElegido;
+      let esForzado = false;
+
+      if (
+        indiceForzado !== null &&
+        !Number.isNaN(indiceForzado) &&
+        indiceForzado >= 0 &&
+        indiceForzado < videos.length
+      ) {
+        indiceElegido = indiceForzado;
+        esForzado = true;
+      } else {
+        indiceElegido = Math.floor(Math.random() * videos.length);
+      }
+
+      const videoElegido = videos[indiceElegido];
+      const numeroId = indiceElegido + 1;
+      const nombreLink = obtenerNombreEnJson(videoElegido, indiceElegido);
+      const claveVideo = obtenerClaveVideo(videoElegido, indiceElegido);
+      const vistasVideo = vistasPorVideo[claveVideo] ?? generarNumeroAleatorioVistas();
+      const tituloAleatorio = obtenerTituloMostrado(videoElegido, indiceElegido);
+
+      destinoActual = obtenerDestinoVideo(videoElegido);
+      linkCompartibleActual = obtenerLinkCompartible(videoElegido, indiceElegido);
+      tituloCompartibleActual = tituloAleatorio;
+      imgCompartibleActual = videoElegido.img || '';
+      vistasCompartibleActual = vistasVideo;
+      segundosRestantesActual = tiempoSegundosReducido();
+
+      sincronizarMetaDatosVideo(tituloAleatorio, videoElegido.img || '', vistasVideo, linkCompartibleActual);
+
+      splashId.textContent = esForzado
+        ? `VIDEO #${numeroId} (${nombreLink}) DE ${videos.length}`
+        : `VIDEO ALEATORIO #${numeroId} (${nombreLink}) DE ${videos.length}`;
+
+      splashVistas.textContent = `${vistasVideo} VISTAS`;
+      splashImg.src = videoElegido.img;
+      splashImg.alt = tituloAleatorio;
+      splashTitulo.textContent = tituloAleatorio;
+      splashTimer.textContent = `REDIRIGIENDO EN ${segundosRestantesActual}s`;
+      splash.style.display = 'flex';
+
+      iniciarContadorSplash();
+    }
+
+    splashCompartir.addEventListener('click', () => {
+      abrirEspaciadoCompartir({
+        titulo: tituloCompartibleActual,
+        img: imgCompartibleActual,
+        vistas: vistasCompartibleActual,
+        link: linkCompartibleActual
+      }, true);
+    });
+
+    splashCopiar.addEventListener('click', () => {
+      copiarAlPortapapeles(linkCompartibleActual, splashCopiar);
+    });
+
+    splashCancelar.addEventListener('click', () => {
+      clearInterval(intervaloRedireccion);
+      reanudarSplashAlCerrar = false;
+      splash.style.display = 'none';
+    });
+
+    cerrarCompartir.addEventListener('click', cerrarEspaciadoCompartir);
+    shareContinuarBtn.addEventListener('click', cerrarEspaciadoCompartir);
+
+    modalCompartir.addEventListener('click', (e) => {
+      if (e.target === modalCompartir) {
+        cerrarEspaciadoCompartir();
+      }
+    });
+
+    shareCopiarInput.addEventListener('click', () => {
+      copiarAlPortapapeles(linkCompartibleActual, shareCopiarInput);
+    });
+
+    shareNativoBtn.addEventListener('click', async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: tituloCompartibleActual || 'MeloGOGO',
+            text: `${tituloCompartibleActual} (${vistasCompartibleActual} VISTAS) - MeloGOGO`,
+            url: linkCompartibleActual
+          });
+        } catch (err) {
+          // Ignorar si cancela
+        }
+      } else {
+        copiarAlPortapapeles(linkCompartibleActual, shareNativoBtn);
+      }
+    });
+
+    async function cargarVideos() {
+      try {
+        const respuesta = await fetch('vid.json', { cache: 'no-store' });
+        listaVideos = await respuesta.json();
+        prepararVistasYTitulosAleatorios(listaVideos);
+        renderizarVideos(listaVideos);
+
+        const params = new URLSearchParams(window.location.search);
+        const valorParam = params.get(NOMBRE_PARAMETRO);
+        const indiceForzado = buscarIndicePorParametro(valorParam, listaVideos);
+
+        iniciarPantallaVideo(listaVideos, indiceForzado);
+      } catch (error) {
+        console.error('Error cargando vid.json:', error);
+      }
+    }
+
+    function renderizarVideos(videos) {
+      grid.innerHTML = '';
+      contador.textContent = `${videos.length} VIDEOS`;
+
+      videos.forEach((video) => {
+        const indiceReal = listaVideos.indexOf(video);
+        const destino = obtenerDestinoVideo(video);
+        const nombreLink = obtenerNombreEnJson(video, indiceReal);
+        const claveVideo = obtenerClaveVideo(video, indiceReal);
+        const vistasVideo = vistasPorVideo[claveVideo] ?? 0;
+        const tituloAleatorio = obtenerTituloMostrado(video, indiceReal);
+        const linkCompartir = obtenerLinkCompartible(video, indiceReal);
+
+        const card = document.createElement('div');
+        card.className = 'video-card';
+
+        card.innerHTML = `
+          <a href="${destino}" target="_blank" rel="noopener noreferrer" class="card-main-link" style="text-decoration:none; color:inherit;">
+            <div class="thumb-wrapper">
+              <img src="${video.img}" alt="${tituloAleatorio}" loading="lazy">
+              <span class="channel-tag">CH-${String(indiceReal + 1).padStart(2, '0')}</span>
+              <span class="channel-tag channel-views">${vistasVideo} VISTAS</span>
+              <div class="play-overlay">
+                <svg viewBox="0 0 24 24" width="38" height="38" fill="currentColor">
+                  <polygon points="6,4 20,12 6,20"></polygon>
+                </svg>
+              </div>
+            </div>
+            <div class="card-info">
+              <h3 style="word-break:break-all;">${tituloAleatorio}</h3>
+            </div>
+          </a>
+          <div class="card-footer-actions">
+            <button type="button" class="btn-90s btn-compartir-card">COMPARTIR</button>
+            <button type="button" class="btn-90s btn-copiar-card">COPIAR LINK</button>
+          </div>
+        `;
+
+        const btnCompartir = card.querySelector('.btn-compartir-card');
+        btnCompartir.addEventListener('click', (e) => {
+          e.stopPropagation();
+          abrirEspaciadoCompartir({
+            titulo: tituloAleatorio,
+            img: video.img || '',
+            vistas: vistasVideo,
+            link: linkCompartir
+          }, false);
+        });
+
+        const btnCopiar = card.querySelector('.btn-copiar-card');
+        btnCopiar.addEventListener('click', (e) => {
+          e.stopPropagation();
+          copiarAlPortapapeles(linkCompartir, btnCopiar);
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    buscador.addEventListener('input', (e) => {
+      const texto = e.target.value.toLowerCase();
+      const filtrados = listaVideos.filter((video) => {
+        const indiceReal = listaVideos.indexOf(video);
+        const tituloAleatorio = obtenerTituloMostrado(video, indiceReal).toLowerCase();
+        const tituloOriginal = (video.titulo || '').toLowerCase();
+        return tituloAleatorio.includes(texto) || tituloOriginal.includes(texto);
+      });
+      renderizarVideos(filtrados);
+    });
+
+    cargarVideos();
+  </script>
+</body>
+</html>
